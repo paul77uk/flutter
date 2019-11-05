@@ -49,6 +49,7 @@ class ContactPage extends StatelessWidget {
                         MaterialPageRoute(
                             builder: (context) => EditPage(
                                   index: index,
+                                  contact: contact,
                                 )),
                       );
                     },

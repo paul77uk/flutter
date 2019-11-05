@@ -4,25 +4,19 @@ import 'package:hive_tutorial/models/contact.dart';
 
 class EditPage extends StatefulWidget {
   final int index;
-  EditPage({this.index});
+  final Contact contact;
+
+  EditPage({this.index, this.contact});
   @override
   _EditPageState createState() => _EditPageState();
 }
 
 class _EditPageState extends State<EditPage> {
-  final myController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
   String _name;
   String _age;
   String _occupation;
-
-  @override
-  void dispose() {
-    // Clean up the controller when the widget is disposed.
-    myController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,27 +32,32 @@ class _EditPageState extends State<EditPage> {
             children: <Widget>[
               Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: TextField(
+                child: TextFormField(
+                  initialValue: widget.contact.name,
                   decoration: InputDecoration(hintText: 'name'),
-                  onChanged: (value) {
+                  onSaved: (value) {
                     _name = value;
                   },
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: TextField(
+                child: TextFormField(
+                  initialValue: widget.contact.age.toString(),
                   decoration: InputDecoration(hintText: 'age'),
-                  onChanged: (value) {
+                  onSaved: (value) {
                     _age = value;
                   },
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: TextField(
-                  decoration: InputDecoration(hintText: 'occupation'),
-                  onChanged: (value) {
+                child: TextFormField(
+                  initialValue: widget.contact.occupation,
+                  decoration: InputDecoration(
+                    hintText: 'occupation',
+                  ),
+                  onSaved: (value) {
                     _occupation = value;
                   },
                 ),

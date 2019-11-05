@@ -1,19 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:hive_tutorial/bloc/contact_bloc.dart';
+import 'package:hive_tutorial/bloc/contact_event.dart';
 
 import 'models/contact.dart';
 
-class NewContactForm extends StatefulWidget {
-  @override
-  _NewContactFormState createState() => _NewContactFormState();
-}
-
-class _NewContactFormState extends State<NewContactForm> {
-  final _formKey = GlobalKey<FormState>();
-
-  String _name;
-  String _age;
-  String _occupation;
+class NewContactForm extends StatelessWidget {
+  final _bloc = ContactBloc();
 
   void addContact(Contact contact) {
     final contactsBox = Hive.box('contacts');
@@ -22,46 +15,45 @@ class _NewContactFormState extends State<NewContactForm> {
 
   @override
   Widget build(BuildContext context) {
-    return Form(
-      key: _formKey,
-      child: Column(
-        children: <Widget>[
-          Row(
-            children: <Widget>[
-              Expanded(
-                child: TextFormField(
-                  decoration: InputDecoration(labelText: 'Name'),
-                  onSaved: (value) => _name = value,
+    return StreamBuilder<Object>(
+        stream: _bloc.contact,
+        builder: (context, snapshot) {
+          return Form(
+            child: Column(
+              children: <Widget>[
+                Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: TextFormField(
+                        decoration: InputDecoration(labelText: 'Name'),
+                        onSaved: (value) => _bloc.updateNameValue(value),
+                      ),
+                    ),
+                    SizedBox(width: 10),
+                    Expanded(
+                      child: TextFormField(
+                        decoration: InputDecoration(labelText: 'Age'),
+                        keyboardType: TextInputType.number,
+                        onSaved: (value) => _bloc.updateAgeValue(value),
+                      ),
+                    ),
+                    SizedBox(width: 10),
+                    Expanded(
+                      child: TextFormField(
+                        decoration: InputDecoration(labelText: 'Occupation'),
+                        onSaved: (value) => _bloc.updateOccupationValue(value),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-              SizedBox(width: 10),
-              Expanded(
-                child: TextFormField(
-                  decoration: InputDecoration(labelText: 'Age'),
-                  keyboardType: TextInputType.number,
-                  onSaved: (value) => _age = value,
+                RaisedButton(
+                  child: Text('Add New Contact'),
+                  onPressed: () =>
+                      _bloc.contactEventSink.add(AddNewContactEvent()),
                 ),
-              ),
-              SizedBox(width: 10),
-              Expanded(
-                child: TextFormField(
-                  decoration: InputDecoration(labelText: 'Occupation'),
-                  onSaved: (value) => _occupation = value,
-                ),
-              ),
-            ],
-          ),
-          RaisedButton(
-            child: Text('Add New Contact'),
-            onPressed: () {
-              _formKey.currentState.save();
-              final newContact = Contact(_name, int.parse(_age), _occupation);
-              addContact(newContact);
-              _formKey.currentState.reset();
-            },
-          ),
-        ],
-      ),
-    );
+              ],
+            ),
+          );
+        });
   }
 }

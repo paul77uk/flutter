@@ -1,10 +1,11 @@
 import 'dart:async';
-import 'package:bloc/bloc.dart';
+import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:hive_tutorial/bloc/contact_event.dart';
 import 'package:hive_tutorial/models/contact.dart';
-import './bloc.dart';
 
-class ContactBloc extends Bloc<ContactEvent, ContactState> {
+class ContactBloc {
+  final _formKey = GlobalKey<FormState>();
   String _name;
   String _age;
   String _occupation;
@@ -17,6 +18,10 @@ class ContactBloc extends Bloc<ContactEvent, ContactState> {
   final _contactEventController = StreamController<ContactEvent>();
   // For events, exposing only a sink which is an input
   Sink<ContactEvent> get contactEventSink => _contactEventController.sink;
+
+  get formKey {
+    return _formKey;
+  }
 
   void addContact(Contact contact) {
     final contactsBox = Hive.box('contacts');
@@ -35,19 +40,18 @@ class ContactBloc extends Bloc<ContactEvent, ContactState> {
     return _occupation = value;
   }
 
-  @override
-  ContactState get initialState => InitialContactState();
+  ContactBloc() {
+    // Whenever there is a new event, we want to map it to a new state
+    _contactEventController.stream.listen(_mapEventToState);
+  }
 
-  @override
-  Stream<ContactState> mapEventToState(
-    ContactEvent event,
-  ) async* {
+  void _mapEventToState(ContactEvent event) {
     // TODO: Add Logic
     if (event is AddNewContactEvent) {
       _inContact.add(updateNameValue(_name));
       _inContact.add(updateAgeValue(_age));
       _inContact.add(updateOccupationValue(_occupation));
-
+      _formKey.currentState.save();
       final newContact = Contact(_name, int.parse(_age), _occupation);
       addContact(newContact);
     }
@@ -57,4 +61,13 @@ class ContactBloc extends Bloc<ContactEvent, ContactState> {
     _contactStateController.close();
     _contactEventController.close();
   }
+
+  // TODO: implement initialState
+  get initialState => null;
+}
+
+@override
+Stream mapEventToState(event) {
+  // TODO: implement mapEventToState
+  return null;
 }

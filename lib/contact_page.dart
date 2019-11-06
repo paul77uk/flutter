@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hive_tutorial/bloc/contact_bloc.dart';
 import 'package:hive_tutorial/edit_page.dart';
 
 import 'models/contact.dart';
@@ -10,6 +11,8 @@ class ContactPage extends StatelessWidget {
   ContactPage({
     Key key,
   }) : super(key: key);
+
+  final _bloc = ContactBloc();
 
   @override
   Widget build(BuildContext context) {
@@ -27,45 +30,49 @@ class ContactPage extends StatelessWidget {
   }
 
   Widget _buildListView() {
-    return WatchBoxBuilder(
-      box: Hive.box('contacts'),
-      builder: (context, contactsBox) {
-        return ListView.builder(
-          itemCount: contactsBox.length,
-          itemBuilder: (context, index) {
-            final contact = contactsBox.getAt(index) as Contact;
+    return StreamBuilder<Object>(
+        stream: _bloc.contact,
+        builder: (context, snapshot) {
+          return WatchBoxBuilder(
+            box: Hive.box('contacts'),
+            builder: (context, contactsBox) {
+              return ListView.builder(
+                itemCount: contactsBox.length,
+                itemBuilder: (context, index) {
+                  final contact = contactsBox.getAt(index) as Contact;
 
-            return ListTile(
-              title: Text(
-                  'name: ${contact.name} \nage: ${contact.age}\noccupation: ${contact.occupation}'),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  IconButton(
-                    icon: Icon(Icons.edit),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => EditPage(
-                                  index: index,
-                                  contact: contact,
-                                )),
-                      );
-                    },
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.delete),
-                    onPressed: () {
-                      contactsBox.deleteAt(index);
-                    },
-                  )
-                ],
-              ),
-            );
-          },
-        );
-      },
-    );
+                  return ListTile(
+                    title: Text(
+                        'name: ${contact.name} \nage: ${contact.age}\noccupation: ${contact.occupation}'),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        IconButton(
+                          icon: Icon(Icons.edit),
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => EditPage(
+                                        index: index,
+                                        contact: contact,
+                                      )),
+                            );
+                          },
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.delete),
+                          onPressed: () {
+                            contactsBox.deleteAt(index);
+                          },
+                        )
+                      ],
+                    ),
+                  );
+                },
+              );
+            },
+          );
+        });
   }
 }

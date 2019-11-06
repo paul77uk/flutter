@@ -1,17 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
+
 import 'package:hive_tutorial/bloc/contact_bloc.dart';
 import 'package:hive_tutorial/bloc/contact_event.dart';
 
-import 'models/contact.dart';
-
 class NewContactForm extends StatelessWidget {
   final _bloc = ContactBloc();
-
-  void addContact(Contact contact) {
-    final contactsBox = Hive.box('contacts');
-    contactsBox.add(contact);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,6 +12,7 @@ class NewContactForm extends StatelessWidget {
         stream: _bloc.contact,
         builder: (context, snapshot) {
           return Form(
+            key: _bloc.formKey,
             child: Column(
               children: <Widget>[
                 Row(
@@ -55,5 +49,8 @@ class NewContactForm extends StatelessWidget {
             ),
           );
         });
+  }
+  void dispose() {
+    _bloc.dispose();
   }
 }
